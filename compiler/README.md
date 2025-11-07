@@ -1,7 +1,3 @@
-# learn-fullstack
-
-> "what I cannot create, I do not understand" - Richard Feynmann
-
 ## Step 1 [done]
 
 - get our hands dirty

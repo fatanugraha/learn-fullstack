@@ -1,4 +1,4 @@
-.PHONY: all clean
+.PHONY: all clean run
 
 boot.o: boot.s
 	i686-elf-as boot.s -o boot.o
@@ -17,6 +17,9 @@ os.iso: os.bin grub.cfg
 	grub-mkrescue -o os.iso isodir
 
 all: os.iso
+
+run: all
+	qemu-system-i386 -cdrom os.iso
 
 clean:
 	rm os.iso os.bin boot.o kernel.o
