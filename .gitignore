@@ -4,3 +4,5 @@ toolchain
 *.bin
 *.iso
 isodir/
+zig-out/
+.zig-cache
