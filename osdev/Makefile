@@ -8,8 +8,11 @@ all:
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o os.iso isodir
 
-run: all
-	qemu-system-i386 -cdrom os.iso
+debug: all
+	qemu-system-i386 -s -S -cdrom os.iso
+
+gdb:
+	gdb -x lol zig-out/bin/os.bin
 
 clean:
 	rm os.iso os.bin boot.o kernel.o

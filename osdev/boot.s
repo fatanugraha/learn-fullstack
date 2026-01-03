@@ -14,11 +14,16 @@
 .align 16
 stack_bottom:
 .skip 16<<10
+.global stack_top
 stack_top:
+.skip 16<<10
+.global user_stack_top
+user_stack_top:
 
 .section .text
 .global _start
 .type _start, @function
+
 _start:
     mov $stack_top, %esp
     call kernel_main
