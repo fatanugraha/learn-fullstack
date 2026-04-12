@@ -1,5 +1,6 @@
 set arch i386
 target remote localhost:1234
-layout asm
-b user_main
+#layout asm
+b kernel.zig:15
+set disassemble-next-line on
 c
