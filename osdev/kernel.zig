@@ -1,26 +1,15 @@
-const ggdt = @import("gdt.zig");
+const segment = @import("segment.zig");
 const serial = @import("serial.zig");
+const symbols = @import("symbols.zig");
 
-const stack_top = @extern(*u32, .{ .name = "stack_top" });
-const user_stack_top = @extern(*u32, .{ .name = "user_stack_top" });
+var gdt: segment.GDT = undefined;
 
 export fn kernel_main() noreturn {
     serial.Writer.initialize();
     serial.Writer.print("[+] kernel booted\n");
 
-    gdt = ggdt.setup_gdt(@intFromPtr(&tssdata));
-    tssdata.esp0 = stack_top.*;
-    tssdata.ss0 = 0x10; // kernel data segment is at 0x10.
-    tssdata.iomap_base = @sizeOf(tss);
-
     // load the gdt table
-    const gdtr: packed struct(u48) {
-        limit: u16,
-        base: u32,
-    } = .{
-        .limit = 8 * 6 - 1,
-        .base = @intFromPtr(&gdt),
-    };
+    gdt.initialize();
 
     asm volatile (
         \\cli
@@ -36,7 +25,7 @@ export fn kernel_main() noreturn {
         \\mov %%ax, %%gs
         \\mov %%ax, %%ss
         :
-        : [a] "r" (&gdtr),
+        : [a] "r" (&gdt.gdtr),
         : .{ .ax = true, .memory = true });
 
     // load tss
@@ -67,7 +56,7 @@ export fn kernel_main() noreturn {
         \\iret
         :
         : [eip] "r" (&user_main),
-          [esp] "r" (&user_stack_top),
+          [esp] "r" (&symbols.extern_user_stack_top),
         : .{ .ax = true });
 
     while (true) {
@@ -75,28 +64,6 @@ export fn kernel_main() noreturn {
     }
 }
 
-fn user_main() noreturn {
+export fn user_main() noreturn {
     while (true) {}
-}
-
-var gdt: [6]u64 = undefined;
-
-const tss = packed struct {
-    prev_tss: u32,
-    esp0: u32, // Kernel stack pointer
-    ss0: u32, // Kernel stack segment
-    unused: u704,
-    iomap_base: u32,
-};
-
-var tssdata: tss = .{
-    .prev_tss = 0,
-    .esp0 = 0,
-    .ss0 = 0,
-    .unused = 0,
-    .iomap_base = 0,
-};
-
-fn printf(comptime fmt: []const u8, args: anytype) void {
-    serial.Writer.printf(fmt, args);
 }

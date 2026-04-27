@@ -12,7 +12,7 @@ run: all
 	qemu-system-i386 -cdrom os.iso -no-reboot -d int,cpu_reset -D qemu.log
 
 debug: all
-	qemu-system-i386 -no-shutdown -no-reboot -s -S -cdrom os.iso -serial stdio -d int,cpu_reset,guest_errors -D qemu.log
+	qemu-system-i386 -no-shutdown -no-reboot -s -S -cdrom os.iso -serial file:serial.log -serial mon:stdio -d int,cpu_reset,guest_errors -D qemu.log
 
 
 clean:
