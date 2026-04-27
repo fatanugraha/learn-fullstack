@@ -1,9 +1,13 @@
 const ggdt = @import("gdt.zig");
+const serial = @import("serial.zig");
 
 const stack_top = @extern(*u32, .{ .name = "stack_top" });
 const user_stack_top = @extern(*u32, .{ .name = "user_stack_top" });
 
 export fn kernel_main() noreturn {
+    serial.Writer.initialize();
+    serial.Writer.print("[+] kernel booted\n");
+
     gdt = ggdt.setup_gdt(@intFromPtr(&tssdata));
     tssdata.esp0 = stack_top.*;
     tssdata.ss0 = 0x10; // kernel data segment is at 0x10.
@@ -72,29 +76,7 @@ export fn kernel_main() noreturn {
 }
 
 fn user_main() noreturn {
-    const msg = "hello world!";
-    print(msg);
-
     while (true) {}
-}
-
-const vga_mem: [*]u16 = @ptrFromInt(0xB8000);
-
-inline fn print(str: []const u8) void {
-    for (str, 0..) |c, i| {
-        if (i > 10) {
-            return;
-        }
-
-        vga_mem[i] = vga_entry(c);
-    }
-}
-
-inline fn vga_entry(c: u8) u16 {
-    const fg = 15;
-    const bg = 0;
-    const color: u8 = fg | bg << 4;
-    return @as(u16, c) | (@as(u16, color) << 8);
 }
 
 var gdt: [6]u64 = undefined;
@@ -114,3 +96,7 @@ var tssdata: tss = .{
     .unused = 0,
     .iomap_base = 0,
 };
+
+fn printf(comptime fmt: []const u8, args: anytype) void {
+    serial.Writer.printf(fmt, args);
+}
