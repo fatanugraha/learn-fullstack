@@ -14,6 +14,7 @@ pub fn build(b: *std.Build) void {
         .root_module = b.createModule(.{
             .target = target,
             .optimize = optimize,
+            .strip = false,
             .root_source_file = b.path("kernel.zig"),
         }),
     });

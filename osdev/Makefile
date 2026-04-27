@@ -12,10 +12,8 @@ run: all
 	qemu-system-i386 -display gtk -cdrom os.iso -no-reboot -d int,cpu_reset -D qemu.log
 
 debug: all
-	qemu-system-i386 -display gtk -s -S -cdrom os.iso -no-reboot -d int,cpu_reset -D qemu.log
+	qemu-system-i386 -display gtk -no-shutdown -no-reboot -s -S -cdrom os.iso -serial stdio -d int,cpu_reset,guest_errors -D qemu.log
 
-gdb:
-	gdb -x lol zig-out/bin/os.bin
 
 clean:
 	rm os.iso os.bin boot.o kernel.o
