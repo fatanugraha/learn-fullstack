@@ -1,6 +1,7 @@
 const segment = @import("segment.zig");
 const serial = @import("serial.zig");
 const symbols = @import("symbols.zig");
+const interrupts = @import("interrupts.zig");
 
 var gdt: segment.GDT = undefined;
 
@@ -28,12 +29,28 @@ export fn kernel_main() noreturn {
         : [a] "r" (&gdt.gdtr),
         : .{ .ax = true, .memory = true });
 
+    // load interrupts
+    interrupts.initialize();
+    asm volatile (
+        \\lidt (%[a])
+        :
+        : [a] "r" (&interrupts.IDTR),
+        : .{ .ax = true, .memory = true });
+
     // load tss
     asm volatile (
         \\ltr %%ax
         :
         : [a] "r" (0x28),
     );
+
+    @setRuntimeSafety(false);
+    var y: u32 = 5;
+    y -= 5;
+    const z: u32 = 10 / y;
+    for (z..10) |_| {
+        serial.Writer.print("hi");
+    }
 
     // jump to user mode
     asm volatile (

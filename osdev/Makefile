@@ -14,6 +14,5 @@ run: all
 debug: all
 	qemu-system-i386 -no-shutdown -no-reboot -s -S -cdrom os.iso -serial file:serial.log -serial mon:stdio -d int,cpu_reset,guest_errors -D qemu.log
 
-
 clean:
 	rm os.iso os.bin boot.o kernel.o
