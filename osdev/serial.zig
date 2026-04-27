@@ -22,11 +22,11 @@ pub const Writer = struct {
         outb(COM1 + 1, 0x0);
     }
 
-    pub fn print(str: []const u8) void {
+    pub fn puts(comptime str: []const u8) void {
         for (str) |c| Writer.putc(c);
     }
 
-    fn putc(c: u8) void {
+    pub fn putc(c: u8) void {
         outb(COM1, c);
     }
 };

@@ -7,7 +7,7 @@ var gdt: segment.GDT = undefined;
 
 export fn kernel_main() noreturn {
     serial.Writer.initialize();
-    serial.Writer.print("[+] kernel booted\n");
+    serial.Writer.puts("[+] kernel booted\n");
 
     // load the gdt table
     gdt.initialize();
@@ -49,7 +49,7 @@ export fn kernel_main() noreturn {
     y -= 5;
     const z: u32 = 10 / y;
     for (z..10) |_| {
-        serial.Writer.print("hi");
+        serial.Writer.puts("hi");
     }
 
     // jump to user mode
